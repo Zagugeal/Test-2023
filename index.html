@@ -1,0 +1,80 @@
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+    <form id ="myForm" class="form" onsubmit="myFunction()">
+        <input id="mail" type="text" placeholder="Введите адрес получателя" pattern="[^@\s]+@[^@\s]+\.[^@\s]+" title="Требуется ввести email-адрес" required>
+        <button class="button">Поиск</button>
+    </form>
+    <div id="Updatable">
+    </div>
+    <script>
+    
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+        });
+        
+        function myFunction() {
+            var mail = document.getElementById('mail').value
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+            }
+            xhttp.open("POST", "http://127.0.0.1/cgi-bin/search.fcgi", true);
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.onreadystatechange = function() {
+                if(xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
+                    var response = xhttp.responseText;
+                    document.getElementById('Updatable').innerHTML = response;
+                    
+                    var beyond_limit = document.getElementById('beyond_limit');
+                    if (beyond_limit){
+                        alert("Колличество найденых строк превышает лимит в 100 записей");
+                    }
+                    
+                    return false;
+                }
+            }
+            var string = "mail=" + encodeURIComponent(mail);
+            xhttp.send(string);
+            return false;
+        }
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("addresses");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.getElementsByTagName("TR");
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount ++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        } 
+    </script>
+</body>
+</html>
